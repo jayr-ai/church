@@ -552,8 +552,8 @@
     </div>
 
     <script>
-        // Google Apps Script Web App endpoint with CORS proxy
-        const APPS_SCRIPT_URL = 'https://cors-anywhere.herokuapp.com/https://script.googleapis.com/macros/s/AKfycbwZXHuu3B_OyEGGMS57_KOurq1s0moX7z3QnZ9LHMUg5m23ej5M6tlsT3-C-ioAhkUL/exec';
+        // Google Apps Script Web App endpoint with free CORS proxy (allorigins.win)
+        const APPS_SCRIPT_URL = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://script.googleapis.com/macros/s/AKfycbwZXHuu3B_OyEGGMS57_KOurq1s0moX7z3QnZ9LHMUg5m23ej5M6tlsT3-C-ioAhkUL/exec');
 
         let allData = [];
         let chartInstances = {};
@@ -589,11 +589,12 @@
                 const errorContainer = document.getElementById('errorContainer');
                 errorContainer.innerHTML = '';
 
-                // Fetch data from Google Apps Script endpoint
+                // Fetch data from Google Apps Script endpoint via CORS proxy
                 const response = await fetch(APPS_SCRIPT_URL);
                 if (!response.ok) throw new Error(`Failed to load data: ${response.statusText}`);
 
-                const result = await response.json();
+                const proxyResult = await response.json();
+                const result = JSON.parse(proxyResult.contents);
                 if (!result.success) throw new Error(result.error || 'Unknown error');
 
                 allData = result.data;
