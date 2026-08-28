@@ -192,40 +192,49 @@
         }
 
         .kpi-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 28px;
             position: relative;
             overflow: hidden;
             transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
         }
 
         .kpi-card:hover {
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.25);
         }
 
-        .kpi-icon {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 16px;
-            opacity: 0.8;
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
         }
 
         .kpi-label {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+        }
+
+        .kpi-icon {
+            width: 28px;
+            height: 28px;
+            opacity: 0.8;
         }
 
         .kpi-value {
-            font-size: 32px;
+            font-size: 48px;
             font-weight: 700;
             margin-bottom: 8px;
-            color: var(--primary);
+            color: #ffffff;
+            line-height: 1;
         }
 
         .kpi-subtext {
@@ -591,53 +600,63 @@
 
             document.getElementById('kpiContainer').innerHTML = `
                 <div class="kpi-card">
-                    <svg class="icon-glow" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M12 7v5l3 2"></path>
-                    </svg>
-                    <div class="kpi-label">Total Members</div>
+                    <div class="kpi-header">
+                        <div class="kpi-label">Total Members</div>
+                        <svg class="icon-glow" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 7v5l3 2"></path>
+                        </svg>
+                    </div>
                     <div class="kpi-value">${totalYA}</div>
                     <div class="kpi-subtext">Active members</div>
                 </div>
 
                 <div class="kpi-card">
-                    <svg class="icon-glow" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <div class="kpi-label">Small Groups</div>
+                    <div class="kpi-header">
+                        <div class="kpi-label">Small Groups</div>
+                        <svg class="icon-glow" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
                     <div class="kpi-value">${smallGroupYes}</div>
                     <div class="kpi-subtext">${(smallGroupYes/totalYA*100).toFixed(1)}% involved</div>
                 </div>
 
                 <div class="kpi-card">
-                    <svg class="icon-glow" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
-                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-                        <path d="M12 6v6l4 2"></path>
-                    </svg>
-                    <div class="kpi-label">Lay Servants</div>
+                    <div class="kpi-header">
+                        <div class="kpi-label">Lay Servants</div>
+                        <svg class="icon-glow" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                    </div>
                     <div class="kpi-value">${layServantYes}</div>
                     <div class="kpi-subtext">${(layServantYes/totalYA*100).toFixed(1)}% serving</div>
                 </div>
 
                 <div class="kpi-card">
-                    <svg class="icon-glow" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
-                        <path d="M11 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"></path>
-                        <path d="M19 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"></path>
-                        <path d="M3 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"></path>
-                    </svg>
-                    <div class="kpi-label">Churches</div>
+                    <div class="kpi-header">
+                        <div class="kpi-label">Churches</div>
+                        <svg class="icon-glow" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
+                            <path d="M11 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"></path>
+                            <path d="M19 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"></path>
+                            <path d="M3 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"></path>
+                        </svg>
+                    </div>
                     <div class="kpi-value">${churches}</div>
                     <div class="kpi-subtext">of 14 total</div>
                 </div>
 
                 <div class="kpi-card">
-                    <svg class="icon-glow" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                    </svg>
-                    <div class="kpi-label">With Contact</div>
+                    <div class="kpi-header">
+                        <div class="kpi-label">With Contact</div>
+                        <svg class="icon-glow" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${colors.primary}" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </div>
                     <div class="kpi-value">${withContact}</div>
                     <div class="kpi-subtext">${(withContact/totalYA*100).toFixed(1)}% have phone</div>
                 </div>
