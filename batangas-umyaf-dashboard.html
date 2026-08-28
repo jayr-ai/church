@@ -971,69 +971,81 @@
 
             const maxCount = Math.max(...Object.values(locations), 1);
 
-            // Accurate SVG map of Batangas Province with geographic positioning
-            const svgHtml = `<svg viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+            // ACCURATE Batangas Province map with proper geographic positioning
+            const svgHtml = `<svg viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
                 <defs>
                     <style>
-                        .municipality { fill: #e8e8e8; stroke: #1e293b; stroke-width: 2; cursor: pointer; transition: all 0.3s; }
-                        .municipality:hover { stroke-width: 3; filter: brightness(1.15); }
-                        .label { font-family: Arial, sans-serif; font-size: 11px; font-weight: 500; text-anchor: middle; pointer-events: none; fill: #1e293b; }
-                        .label-small { font-family: Arial, sans-serif; font-size: 9px; text-anchor: middle; pointer-events: none; fill: #1e293b; }
+                        .municipality-polygon { fill: #e8f4f8; stroke: #2c5aa0; stroke-width: 2; cursor: pointer; transition: all 0.3s; }
+                        .municipality-polygon:hover { stroke-width: 3; filter: brightness(1.15); }
+                        .municipality-label { font-size: 11px; font-weight: 600; fill: #1a3a5c; text-anchor: middle; pointer-events: none; }
+                        .water { fill: #b3d9f2; stroke: none; }
                     </style>
                 </defs>
 
-                <!-- WESTERN COASTAL MUNICIPALITIES -->
-                <polygon id="nasugbu" class="municipality" points="85,60 120,65 115,135 80,130"/>
-                <text class="label" x="100" y="100">Nasugbu</text>
+                <!-- Water background -->
+                <rect x="0" y="0" width="800" height="900" class="water" opacity="0.3"/>
+                <circle cx="80" cy="300" r="120" class="water" opacity="0.5"/>
 
-                <polygon id="calatagan" class="municipality" points="75,150 125,145 125,220 70,215"/>
-                <text class="label" x="98" y="185">Calatagan</text>
+                <!-- WESTERN COAST (1st District) -->
+                <polygon id="rosario" class="municipality-polygon" points="150,120 180,115 185,145 155,150"/>
+                <text class="municipality-label" x="168" y="135">Rosario</text>
 
-                <polygon id="balayan" class="municipality" points="65,235 130,230 135,310 60,315"/>
-                <text class="label" x="98" y="275">Balayan</text>
+                <polygon id="nasugbu" class="municipality-polygon" points="130,170 165,165 170,210 135,215"/>
+                <text class="municipality-label" x="150" y="193">Nasugbu</text>
 
-                <polygon id="tuy" class="municipality" points="55,330 135,320 140,395 50,405"/>
-                <text class="label" x="95" y="362">Tuy</text>
+                <polygon id="tuy" class="municipality-polygon" points="145,230 180,225 185,280 150,285"/>
+                <text class="municipality-label" x="165" y="258">Tuy</text>
 
-                <polygon id="bauan" class="municipality" points="50,415 145,400 150,485 45,495"/>
-                <text class="label" x="97" y="450">Bauan</text>
+                <polygon id="bauan" class="municipality-polygon" points="155,295 195,290 200,350 160,355"/>
+                <text class="municipality-label" x="177" y="323">Bauan</text>
 
-                <polygon id="mabini" class="municipality" points="45,510 150,490 155,575 40,590"/>
-                <text class="label" x="97" y="550">Mabini</text>
+                <polygon id="lian" class="municipality-polygon" points="160,365 200,360 205,420 165,425"/>
+                <text class="municipality-label" x="183" y="393">Lian</text>
 
-                <!-- CENTRAL/INLAND MUNICIPALITIES -->
-                <polygon id="agoncillo" class="municipality" points="160,240 220,235 225,310 160,315"/>
-                <text class="label" x="192" y="275">Agoncillo</text>
+                <polygon id="balayan" class="municipality-polygon" points="140,435 185,430 190,495 145,500"/>
+                <text class="municipality-label" x="165" y="468">Balayan</text>
 
-                <polygon id="rosario" class="municipality" points="230,215 290,210 295,280 235,285"/>
-                <text class="label" x="262" y="250">Rosario</text>
+                <!-- CENTRAL REGION (2nd District) -->
+                <polygon id="batangas-city" class="municipality-polygon" points="250,280 330,270 340,370 260,380"/>
+                <text class="municipality-label" x="295" y="330">Batangas City</text>
 
-                <polygon id="lipa-city" class="municipality" points="240,330 310,320 320,420 245,430"/>
-                <text class="label-small" x="282" y="377">Lipa City</text>
+                <polygon id="lemery" class="municipality-polygon" points="210,385 265,380 270,450 215,455"/>
+                <text class="municipality-label" x="240" y="420">Lemery</text>
 
-                <polygon id="batangas-city" class="municipality" points="180,350 260,340 270,420 190,430"/>
-                <text class="label-small" x="225" y="385">Batangas City</text>
+                <polygon id="santo-tomas" class="municipality-polygon" points="280,395 345,390 350,460 285,465"/>
+                <text class="municipality-label" x="315" y="430">Santo Tomas</text>
 
-                <polygon id="tanauan" class="municipality" points="310,290 380,280 390,360 320,370"/>
-                <text class="label" x="350" y="325">Tanauan</text>
+                <polygon id="calaca" class="municipality-polygon" points="235,470 295,465 300,530 240,535"/>
+                <text class="municipality-label" x="268" y="503">Calaca</text>
 
-                <polygon id="santo-tomas" class="municipality" points="340,375 420,365 430,445 350,455"/>
-                <text class="label-small" x="390" y="410">Santo Tomas</text>
+                <polygon id="lobo" class="municipality-polygon" points="255,560 310,555 315,620 260,625"/>
+                <text class="municipality-label" x="285" y="593">Lobo</text>
 
-                <polygon id="malvar" class="municipality" points="420,320 480,315 490,390 430,395"/>
-                <text class="label" x="455" y="355">Malvar</text>
+                <!-- EASTERN REGION (3rd District) -->
+                <polygon id="san-pascual" class="municipality-polygon" points="380,250 430,245 435,310 385,315"/>
+                <text class="municipality-label" x="408" y="280">San Pascual</text>
 
-                <polygon id="san-pablo" class="municipality" points="300,480 380,470 390,560 310,570"/>
-                <text class="label" x="345" y="520">San Pablo</text>
+                <polygon id="taal" class="municipality-polygon" points="395,330 450,325 455,400 400,405"/>
+                <text class="municipality-label" x="427" y="365">Taal</text>
 
-                <polygon id="ibaan" class="municipality" points="200,500 280,490 290,565 210,575"/>
-                <text class="label" x="245" y="535">Ibaan</text>
+                <polygon id="ibaan" class="municipality-polygon" points="340,420 400,415 405,490 345,495"/>
+                <text class="municipality-label" x="373" y="457">Ibaan</text>
 
-                <polygon id="lemery" class="municipality" points="140,600 220,590 230,650 150,660"/>
-                <text class="label" x="185" y="625">Lemery</text>
+                <polygon id="mabini" class="municipality-polygon" points="410,520 480,515 485,600 415,605"/>
+                <text class="municipality-label" x="448" y="562">Mabini</text>
 
-                <polygon id="cuenca" class="municipality" points="235,610 310,600 320,665 245,675"/>
-                <text class="label" x="278" y="640">Cuenca</text>
+                <!-- SOUTHERN REGION (4th District) -->
+                <polygon id="calatagan" class="municipality-polygon" points="270,620 330,615 335,700 275,705"/>
+                <text class="municipality-label" x="303" y="662">Calatagan</text>
+
+                <polygon id="tingloy" class="municipality-polygon" points="490,650 540,645 545,720 495,725"/>
+                <text class="municipality-label" x="518" y="688">Tingloy</text>
+
+                <polygon id="alitagtag" class="municipality-polygon" points="440,750 495,745 500,820 445,825"/>
+                <text class="municipality-label" x="470" y="787">Alitagtag</text>
+
+                <polygon id="balete" class="municipality-polygon" points="370,770 425,765 430,840 375,845"/>
+                <text class="municipality-label" x="400" y="807">Balete</text>
             </svg>`;
 
             mapContainer.innerHTML = svgHtml;
@@ -1045,35 +1057,20 @@
                 if (!polygon) continue;
 
                 const intensity = count / maxCount;
-                // Heatmap: Red (high) → Yellow (medium) → Green (low) → Blue (very low)
                 let hue, sat, light;
 
                 if (intensity > 0.6) {
-                    // Red (high concentration)
-                    hue = 0;
-                    sat = 80;
-                    light = Math.max(40, 50 - intensity * 10);
+                    hue = 0; sat = 80; light = Math.max(40, 50 - intensity * 10);
                 } else if (intensity > 0.3) {
-                    // Orange/Yellow (medium)
-                    hue = 40 - (intensity - 0.3) * 50;
-                    sat = 75;
-                    light = 45;
+                    hue = 40 - (intensity - 0.3) * 50; sat = 75; light = 45;
                 } else if (intensity > 0.1) {
-                    // Green (low-medium)
-                    hue = 120;
-                    sat = 70;
-                    light = 50;
+                    hue = 120; sat = 70; light = 50;
                 } else {
-                    // Blue/Light (very low)
-                    hue = 200;
-                    sat = 65;
-                    light = 60;
+                    hue = 200; sat = 65; light = 60;
                 }
 
                 const color = `hsl(${hue}, ${sat}%, ${light}%)`;
                 polygon.setAttribute('fill', color);
-
-                // Add hover info
                 polygon.title = `${city}: ${count} member${count !== 1 ? 's' : ''} (${((count/maxCount)*100).toFixed(1)}%)`;
             }
         }
