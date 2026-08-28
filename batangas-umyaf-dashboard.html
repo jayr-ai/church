@@ -971,128 +971,111 @@
 
             const maxCount = Math.max(...Object.values(locations), 1);
 
-            // SVG Batangas map with municipality regions - simplified geographic representation
-            const svgHtml = `<svg viewBox="0 0 400 500" style="width: 100%; height: 100%;">
-                <style>
-                    .municipality-region { stroke: #1e293b; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
-                    .municipality-region:hover { stroke-width: 2.5; filter: brightness(1.2); }
-                    .municipality-label { font-size: 10px; font-weight: 600; fill: white; pointer-events: none; text-anchor: middle; }
-                    .municipality-count { font-size: 12px; font-weight: 700; fill: white; pointer-events: none; text-anchor: middle; }
-                </style>
+            // Accurate SVG map of Batangas Province with geographic positioning
+            const svgHtml = `<svg viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <defs>
+                    <style>
+                        .municipality { fill: #e8e8e8; stroke: #1e293b; stroke-width: 2; cursor: pointer; transition: all 0.3s; }
+                        .municipality:hover { stroke-width: 3; filter: brightness(1.15); }
+                        .label { font-family: Arial, sans-serif; font-size: 11px; font-weight: 500; text-anchor: middle; pointer-events: none; fill: #1e293b; }
+                        .label-small { font-family: Arial, sans-serif; font-size: 9px; text-anchor: middle; pointer-events: none; fill: #1e293b; }
+                    </style>
+                </defs>
 
-                <!-- Western Coastal Region (Blue shades) -->
-                <g id="nasugbu" class="municipality-region" onclick="showMunicipalityInfo('NASUGBU')">
-                    <path d="M 50 80 L 90 70 L 95 110 L 70 120 Z" fill="hsl(200, 65%, 50%)"/>
-                    <text class="municipality-label" x="70" y="100">Nasugbu</text>
-                </g>
+                <!-- WESTERN COASTAL MUNICIPALITIES -->
+                <polygon id="nasugbu" class="municipality" points="85,60 120,65 115,135 80,130"/>
+                <text class="label" x="100" y="100">Nasugbu</text>
 
-                <g id="tuy" class="municipality-region" onclick="showMunicipalityInfo('TUY')">
-                    <path d="M 50 140 L 90 130 L 95 170 L 70 180 Z" fill="hsl(200, 65%, 50%)"/>
-                    <text class="municipality-label" x="70" y="155">Tuy</text>
-                </g>
+                <polygon id="calatagan" class="municipality" points="75,150 125,145 125,220 70,215"/>
+                <text class="label" x="98" y="185">Calatagan</text>
 
-                <g id="calatagan" class="municipality-region" onclick="showMunicipalityInfo('CALATAGAN')">
-                    <path d="M 30 180 L 70 170 L 80 220 L 50 230 Z" fill="hsl(200, 65%, 50%)"/>
-                    <text class="municipality-label" x="55" y="200">Calatagan</text>
-                </g>
+                <polygon id="balayan" class="municipality" points="65,235 130,230 135,310 60,315"/>
+                <text class="label" x="98" y="275">Balayan</text>
 
-                <g id="balayan" class="municipality-region" onclick="showMunicipalityInfo('BALAYAN')">
-                    <path d="M 70 170 L 110 160 L 120 210 L 80 220 Z" fill="hsl(200, 65%, 50%)"/>
-                    <text class="municipality-label" x="95" y="190">Balayan</text>
-                </g>
+                <polygon id="tuy" class="municipality" points="55,330 135,320 140,395 50,405"/>
+                <text class="label" x="95" y="362">Tuy</text>
 
-                <!-- Central Region (Green shades) -->
-                <g id="bauan" class="municipality-region" onclick="showMunicipalityInfo('BAUAN')">
-                    <path d="M 110 200 L 150 190 L 160 240 L 120 250 Z" fill="hsl(150, 70%, 45%)"/>
-                    <text class="municipality-label" x="135" y="220">Bauan</text>
-                </g>
+                <polygon id="bauan" class="municipality" points="50,415 145,400 150,485 45,495"/>
+                <text class="label" x="97" y="450">Bauan</text>
 
-                <g id="mabini" class="municipality-region" onclick="showMunicipalityInfo('MABINI')">
-                    <path d="M 140 250 L 180 240 L 190 290 L 150 300 Z" fill="hsl(150, 70%, 45%)"/>
-                    <text class="municipality-label" x="165" y="270">Mabini</text>
-                </g>
+                <polygon id="mabini" class="municipality" points="45,510 150,490 155,575 40,590"/>
+                <text class="label" x="97" y="550">Mabini</text>
 
-                <g id="batangas-city" class="municipality-region" onclick="showMunicipalityInfo('BATANGAS CITY')">
-                    <path d="M 120 280 L 160 270 L 170 320 L 130 330 Z" fill="hsl(150, 70%, 45%)"/>
-                    <text class="municipality-label" x="145" y="300">Batangas City</text>
-                </g>
+                <!-- CENTRAL/INLAND MUNICIPALITIES -->
+                <polygon id="agoncillo" class="municipality" points="160,240 220,235 225,310 160,315"/>
+                <text class="label" x="192" y="275">Agoncillo</text>
 
-                <g id="lemery" class="municipality-region" onclick="showMunicipalityInfo('LEMERY')">
-                    <path d="M 160 310 L 200 300 L 210 350 L 170 360 Z" fill="hsl(150, 70%, 45%)"/>
-                    <text class="municipality-label" x="185" y="330">Lemery</text>
-                </g>
+                <polygon id="rosario" class="municipality" points="230,215 290,210 295,280 235,285"/>
+                <text class="label" x="262" y="250">Rosario</text>
 
-                <!-- Eastern Region (Yellow/Green shades) -->
-                <g id="lipa-city" class="municipality-region" onclick="showMunicipalityInfo('LIPA CITY')">
-                    <path d="M 150 150 L 190 140 L 200 190 L 160 200 Z" fill="hsl(80, 70%, 50%)"/>
-                    <text class="municipality-label" x="175" y="170">Lipa City</text>
-                </g>
+                <polygon id="lipa-city" class="municipality" points="240,330 310,320 320,420 245,430"/>
+                <text class="label-small" x="282" y="377">Lipa City</text>
 
-                <g id="tanauan" class="municipality-region" onclick="showMunicipalityInfo('TANAUAN')">
-                    <path d="M 190 140 L 230 130 L 240 180 L 200 190 Z" fill="hsl(100, 70%, 50%)"/>
-                    <text class="municipality-label" x="215" y="160">Tanauan</text>
-                </g>
+                <polygon id="batangas-city" class="municipality" points="180,350 260,340 270,420 190,430"/>
+                <text class="label-small" x="225" y="385">Batangas City</text>
 
-                <g id="agoncillo" class="municipality-region" onclick="showMunicipalityInfo('AGONCILLO')">
-                    <path d="M 150 200 L 190 190 L 200 240 L 160 250 Z" fill="hsl(120, 70%, 50%)"/>
-                    <text class="municipality-label" x="175" y="220">Agoncillo</text>
-                </g>
+                <polygon id="tanauan" class="municipality" points="310,290 380,280 390,360 320,370"/>
+                <text class="label" x="350" y="325">Tanauan</text>
 
-                <g id="rosario" class="municipality-region" onclick="showMunicipalityInfo('ROSARIO')">
-                    <path d="M 190 190 L 230 180 L 240 230 L 200 240 Z" fill="hsl(120, 70%, 50%)"/>
-                    <text class="municipality-label" x="215" y="210">Rosario</text>
-                </g>
+                <polygon id="santo-tomas" class="municipality" points="340,375 420,365 430,445 350,455"/>
+                <text class="label-small" x="390" y="410">Santo Tomas</text>
 
-                <g id="ibaan" class="municipality-region" onclick="showMunicipalityInfo('IBAAN')">
-                    <path d="M 210 240 L 250 230 L 260 280 L 220 290 Z" fill="hsl(120, 70%, 50%)"/>
-                    <text class="municipality-label" x="235" y="260">Ibaan</text>
-                </g>
+                <polygon id="malvar" class="municipality" points="420,320 480,315 490,390 430,395"/>
+                <text class="label" x="455" y="355">Malvar</text>
 
-                <g id="san-pablo" class="municipality-region" onclick="showMunicipalityInfo('SAN PABLO')">
-                    <path d="M 230 180 L 270 170 L 280 220 L 240 230 Z" fill="hsl(100, 70%, 50%)"/>
-                    <text class="municipality-label" x="255" y="200">San Pablo</text>
-                </g>
+                <polygon id="san-pablo" class="municipality" points="300,480 380,470 390,560 310,570"/>
+                <text class="label" x="345" y="520">San Pablo</text>
 
-                <g id="malvar" class="municipality-region" onclick="showMunicipalityInfo('MALVAR')">
-                    <path d="M 230 230 L 270 220 L 280 270 L 240 280 Z" fill="hsl(120, 70%, 50%)"/>
-                    <text class="municipality-label" x="255" y="250">Malvar</text>
-                </g>
+                <polygon id="ibaan" class="municipality" points="200,500 280,490 290,565 210,575"/>
+                <text class="label" x="245" y="535">Ibaan</text>
 
-                <g id="santo-tomas" class="municipality-region" onclick="showMunicipalityInfo('SANTO TOMAS')">
-                    <path d="M 270 220 L 310 210 L 320 260 L 280 270 Z" fill="hsl(120, 70%, 50%)"/>
-                    <text class="municipality-label" x="295" y="240">Santo Tomas</text>
-                </g>
+                <polygon id="lemery" class="municipality" points="140,600 220,590 230,650 150,660"/>
+                <text class="label" x="185" y="625">Lemery</text>
 
-                <g id="cuenca" class="municipality-region" onclick="showMunicipalityInfo('CUENCA')">
-                    <path d="M 160 280 L 200 270 L 210 320 L 170 330 Z" fill="hsl(150, 70%, 45%)"/>
-                    <text class="municipality-label" x="185" y="300">Cuenca</text>
-                </g>
+                <polygon id="cuenca" class="municipality" points="235,610 310,600 320,665 245,675"/>
+                <text class="label" x="278" y="640">Cuenca</text>
             </svg>`;
 
             mapContainer.innerHTML = svgHtml;
 
-            // Color municipalities based on data
+            // Apply heatmap coloring based on member concentration
             for (const [city, count] of Object.entries(locations)) {
-                const element = document.querySelector(`#${city.toLowerCase().replace(/\s+/g, '-')}`);
-                if (!element) continue;
+                const polygonId = city.toLowerCase().replace(/\s+/g, '-');
+                const polygon = document.getElementById(polygonId);
+                if (!polygon) continue;
 
                 const intensity = count / maxCount;
-                const hue = 120 - (intensity * 120); // Green (120) to Red (0)
-                const sat = Math.max(50, 70 - intensity * 20);
-                const light = Math.max(40, 60 - intensity * 20);
-                const color = `hsl(${hue}, ${sat}%, ${light}%)`;
+                // Heatmap: Red (high) → Yellow (medium) → Green (low) → Blue (very low)
+                let hue, sat, light;
 
-                const path = element.querySelector('path');
-                if (path) path.setAttribute('fill', color);
+                if (intensity > 0.6) {
+                    // Red (high concentration)
+                    hue = 0;
+                    sat = 80;
+                    light = Math.max(40, 50 - intensity * 10);
+                } else if (intensity > 0.3) {
+                    // Orange/Yellow (medium)
+                    hue = 40 - (intensity - 0.3) * 50;
+                    sat = 75;
+                    light = 45;
+                } else if (intensity > 0.1) {
+                    // Green (low-medium)
+                    hue = 120;
+                    sat = 70;
+                    light = 50;
+                } else {
+                    // Blue/Light (very low)
+                    hue = 200;
+                    sat = 65;
+                    light = 60;
+                }
+
+                const color = `hsl(${hue}, ${sat}%, ${light}%)`;
+                polygon.setAttribute('fill', color);
 
                 // Add hover info
-                element.title = `${city}: ${count} member${count !== 1 ? 's' : ''} (${((count/maxCount)*100).toFixed(1)}%)`;
+                polygon.title = `${city}: ${count} member${count !== 1 ? 's' : ''} (${((count/maxCount)*100).toFixed(1)}%)`;
             }
-
-            window.showMunicipalityInfo = function(city) {
-                const count = locations[city] || 0;
-                alert(`${city}\n${count} member${count !== 1 ? 's' : ''}\n${((count/maxCount)*100).toFixed(1)}% of total`);
-            };
         }
 
         function renderSummary() {
