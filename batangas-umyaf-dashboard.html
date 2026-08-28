@@ -510,18 +510,11 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: Geographic & Summary (Single Row - 60% / 40%) -->
-                    <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 60% 40%; gap: 24px;">
-                        <div class="map-card">
-                            <div class="chart-title">Geographic Distribution - Batangas</div>
-                            <div id="batangasMap" style="height: 400px; margin-top: 16px; border-radius: 8px; overflow: hidden;"></div>
-                        </div>
-
-                        <div class="summary-card">
-                            <div class="chart-title">Executive Summary</div>
-                            <div id="summaryContent">
-                                <p style="color: var(--text-secondary);">Loading summary...</p>
-                            </div>
+                    <!-- Row 3: Executive Summary -->
+                    <div class="summary-card" style="grid-column: 1 / -1;">
+                        <div class="chart-title">Executive Summary</div>
+                        <div id="summaryContent">
+                            <p style="color: var(--text-secondary);">Loading summary...</p>
                         </div>
                     </div>
                 </div>
@@ -730,7 +723,6 @@
             renderInvolvementChart();
             renderAgeChart();
             renderChurchChart();
-            renderMap();
             renderSummary();
         }
 
@@ -946,115 +938,6 @@
                     }
                 }
             });
-        }
-
-        function renderMap() {
-            const mapContainer = document.getElementById('batangasMap');
-            if (!mapContainer) return;
-
-            // Parse locations from sheet
-            const locations = {};
-            allData.forEach(row => {
-                const loc = row['LOCATION / ADDRESS (City, Province is fine)'] || 'UNKNOWN';
-                let city = 'UNKNOWN';
-                const parts = loc.split(',').map(p => p.trim().toUpperCase());
-
-                // Format is "BARANGAY, CITY, PROVINCE" - extract CITY (second part)
-                if (parts.length >= 2) {
-                    city = parts[1]; // Get the CITY part
-                } else if (parts.length === 1) {
-                    city = parts[0]; // Fallback to first part if only one element
-                }
-
-                locations[city] = (locations[city] || 0) + 1;
-            });
-
-            const maxCount = Math.max(...Object.values(locations), 1);
-
-            // ACCURATE Batangas Province map matching geographic reference
-            const svgHtml = `<svg viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-              <defs>
-                <style>
-                  .district-1 { fill: #4a90e2; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
-                  .district-2 { fill: #7cb342; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
-                  .district-3 { fill: #a68b70; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
-                  .district-4 { fill: #f7c325; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
-                  .water-feature { fill: #ffffff; stroke: #4a90e2; stroke-width: 1; }
-                  .municipality-label { font-size: 10px; font-family: Arial, sans-serif; font-weight: 500; text-anchor: middle; fill: #000; pointer-events: none; }
-                  .district-boundary { fill: none; stroke: #2c3e50; stroke-width: 2; }
-                </style>
-              </defs>
-              <rect width="600" height="700" fill="#e8f4f8"/>
-              <path class="district-1" d="M 110 120 L 180 100 L 200 150 L 210 200 L 180 250 L 150 280 L 120 250 L 100 200 L 90 150 Z" id="d1-1"/>
-              <path class="district-1" d="M 90 150 L 80 180 L 75 220 L 85 260 L 120 250 L 100 200 Z" id="d1-2"/>
-              <path class="district-1" d="M 150 280 L 160 320 L 140 340 L 120 320 L 130 300 Z" id="d1-3"/>
-              <path class="district-2" d="M 210 200 L 280 220 L 300 280 L 280 320 L 240 340 L 200 320 L 180 250 Z" id="d2-1"/>
-              <path class="district-2" d="M 240 340 L 270 360 L 260 380 L 230 370 Z" id="d2-2"/>
-              <path class="district-3" d="M 200 150 L 280 120 L 320 140 L 340 200 L 320 260 L 280 220 L 210 200 Z" id="d3-1"/>
-              <path class="district-3" d="M 320 140 L 360 160 L 380 220 L 340 200 Z" id="d3-2"/>
-              <path class="district-4" d="M 320 260 L 380 220 L 420 250 L 430 310 L 400 360 L 340 340 L 300 280 Z" id="d4-1"/>
-              <path class="district-4" d="M 430 310 L 450 340 L 430 380 L 400 360 Z" id="d4-2"/>
-              <ellipse cx="270" cy="180" rx="55" ry="65" class="water-feature"/>
-              <path class="water-feature" d="M 385 240 Q 420 260 410 310 Q 390 320 370 300 Q 380 270 385 240 Z"/>
-              <circle cx="310" cy="420" r="12" class="water-feature"/>
-              <circle cx="280" cy="380" r="8" class="water-feature"/>
-              <path class="district-boundary" d="M 110 120 L 180 100 L 200 150 L 280 120 L 360 160 L 420 250 L 450 340 L 430 380 L 400 360 L 340 340 L 270 360 L 260 380 L 230 370 L 220 400 L 180 420 L 140 400 L 120 350 L 100 300 L 80 220 L 75 180 L 85 150 L 110 120 Z"/>
-              <text x="270" y="185" class="municipality-label" font-size="11px">Taal Lake</text>
-              <text x="410" y="290" class="municipality-label" font-size="11px">Batangas Bay</text>
-              <text x="310" y="440" class="municipality-label" font-size="10px">Verde Island</text>
-              <text x="145" y="115" class="municipality-label" id="nasugbu">Nasugbu</text>
-              <text x="125" y="165" class="municipality-label" id="lian">Lian</text>
-              <text x="155" y="185" class="municipality-label" id="tuy">Tuy</text>
-              <text x="130" y="240" class="municipality-label" id="balayan">Balayan</text>
-              <text x="110" y="290" class="municipality-label" id="calatagan">Calatagan</text>
-              <text x="185" y="220" class="municipality-label" id="agoncillo">Agoncillo</text>
-              <text x="210" y="240" class="municipality-label" id="san-nicolas">San Nicolas</text>
-              <text x="195" y="280" class="municipality-label" id="sta-teresita">Sta. Teresita</text>
-              <text x="240" y="200" class="municipality-label" id="alitagtag">Alitagtag</text>
-              <text x="245" y="250" class="municipality-label" id="san-loy">San Loy</text>
-              <text x="270" y="300" class="municipality-label" id="bauan">Bauan</text>
-              <text x="255" y="360" class="municipality-label" id="malayan">Malayan</text>
-              <text x="310" y="350" class="municipality-label" id="lobo">Lobo</text>
-              <text x="330" y="320" class="municipality-label" id="batangas-city">Batangas City</text>
-              <text x="295" y="155" class="municipality-label" id="laurel">Laurel</text>
-              <text x="340" y="160" class="municipality-label" id="talisay">Talisay</text>
-              <text x="370" y="190" class="municipality-label" id="tanauan">Tanauan</text>
-              <text x="350" y="240" class="municipality-label" id="malvar">Malvar</text>
-              <text x="310" y="220" class="municipality-label" id="santo-tomas">Sto. Tomas</text>
-              <text x="345" y="280" class="municipality-label" id="cuenca">Cuenca</text>
-              <text x="370" y="310" class="municipality-label" id="ibaan">Ibaan</text>
-              <text x="375" y="280" class="municipality-label" id="lipa-city">Lipa City</text>
-              <text x="410" y="330" class="municipality-label" id="padre-garcia">Padre Garcia</text>
-              <text x="445" y="310" class="municipality-label" id="san-juan">San Juan</text>
-              <text x="420" y="360" class="municipality-label" id="rosario">Rosario</text>
-              <text x="380" y="380" class="municipality-label" id="taysan">Taysan</text>
-            </svg>`;
-
-            mapContainer.innerHTML = svgHtml;
-
-            // Apply heatmap coloring based on member concentration
-            for (const [city, count] of Object.entries(locations)) {
-                const polygonId = city.toLowerCase().replace(/\s+/g, '-');
-                const polygon = document.getElementById(polygonId);
-                if (!polygon) continue;
-
-                const intensity = count / maxCount;
-                let hue, sat, light;
-
-                if (intensity > 0.6) {
-                    hue = 0; sat = 80; light = Math.max(40, 50 - intensity * 10);
-                } else if (intensity > 0.3) {
-                    hue = 40 - (intensity - 0.3) * 50; sat = 75; light = 45;
-                } else if (intensity > 0.1) {
-                    hue = 120; sat = 70; light = 50;
-                } else {
-                    hue = 200; sat = 65; light = 60;
-                }
-
-                const color = `hsl(${hue}, ${sat}%, ${light}%)`;
-                polygon.setAttribute('fill', color);
-                polygon.title = `${city}: ${count} member${count !== 1 ? 's' : ''} (${((count/maxCount)*100).toFixed(1)}%)`;
-            }
         }
 
         function renderSummary() {
