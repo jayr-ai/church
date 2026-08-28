@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Batangas UMYAF Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <style>
@@ -952,84 +950,143 @@
 
         function renderMap() {
             const mapContainer = document.getElementById('batangasMap');
-            if (!mapContainer || !window.L) return;
+            if (!mapContainer) return;
 
-            // Parse locations
+            // Parse locations from sheet
             const locations = {};
             allData.forEach(row => {
                 const loc = row['LOCATION / ADDRESS (City, Province is fine)'] || 'UNKNOWN';
                 let city = loc.split(',')[0].trim().toUpperCase();
+                // Normalize common city variations
                 if (city.includes('HALANG')) city = 'LIPA CITY';
+                if (city.includes('PLARIDEL')) city = 'TANAUAN';
                 locations[city] = (locations[city] || 0) + 1;
             });
 
             const maxCount = Math.max(...Object.values(locations), 1);
 
-            // Batangas municipality coordinates (lat, lng)
-            const municipalityCoords = {
-                'LIPA CITY': [13.9549, 121.1794],
-                'BATANGAS CITY': [13.7596, 121.1847],
-                'NASUGBU': [13.8924, 120.7436],
-                'CALATAGAN': [13.7689, 120.6256],
-                'BALAYAN': [13.8397, 120.7819],
-                'BAUAN': [13.8033, 121.0569],
-                'TANAUAN': [13.9067, 121.1331],
-                'TALISAY': [14.0611, 121.1542],
-                'AGONCILLO': [13.8747, 121.0986],
-                'MABINI': [13.7311, 120.9419],
-                'IBAAN': [13.8872, 121.2686],
-                'ROSARIO': [13.9639, 121.2253],
-                'MALVAR': [13.9358, 121.2769],
-                'LEMERY': [13.9386, 121.3269],
-                'SANTO TOMAS': [13.9622, 121.3547],
-                'CUENCA': [13.9333, 121.1833],
-                'SAN PABLO': [14.0392, 121.3211],
-                'TUY': [13.8197, 120.9486],
-                'UNKNOWN': [13.9, 121.1]
-            };
+            // SVG Batangas map with municipality regions - simplified geographic representation
+            const svgHtml = `<svg viewBox="0 0 400 500" style="width: 100%; height: 100%;">
+                <style>
+                    .municipality-region { stroke: #1e293b; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
+                    .municipality-region:hover { stroke-width: 2.5; filter: brightness(1.2); }
+                    .municipality-label { font-size: 10px; font-weight: 600; fill: white; pointer-events: none; text-anchor: middle; }
+                    .municipality-count { font-size: 12px; font-weight: 700; fill: white; pointer-events: none; text-anchor: middle; }
+                </style>
 
-            // Initialize or recreate map
-            if (window.batangasMapInstance) {
-                window.batangasMapInstance.remove();
-            }
+                <!-- Western Coastal Region (Blue shades) -->
+                <g id="nasugbu" class="municipality-region" onclick="showMunicipalityInfo('NASUGBU')">
+                    <path d="M 50 80 L 90 70 L 95 110 L 70 120 Z" fill="hsl(200, 65%, 50%)"/>
+                    <text class="municipality-label" x="70" y="100">Nasugbu</text>
+                </g>
 
-            const map = L.map('batangasMap', {
-                center: [13.9, 121.1],
-                zoom: 10,
-                scrollWheelZoom: true
-            });
+                <g id="tuy" class="municipality-region" onclick="showMunicipalityInfo('TUY')">
+                    <path d="M 50 140 L 90 130 L 95 170 L 70 180 Z" fill="hsl(200, 65%, 50%)"/>
+                    <text class="municipality-label" x="70" y="155">Tuy</text>
+                </g>
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap',
-                maxZoom: 13
-            }).addTo(map);
+                <g id="calatagan" class="municipality-region" onclick="showMunicipalityInfo('CALATAGAN')">
+                    <path d="M 30 180 L 70 170 L 80 220 L 50 230 Z" fill="hsl(200, 65%, 50%)"/>
+                    <text class="municipality-label" x="55" y="200">Calatagan</text>
+                </g>
 
-            // Add circles for each location with member data
+                <g id="balayan" class="municipality-region" onclick="showMunicipalityInfo('BALAYAN')">
+                    <path d="M 70 170 L 110 160 L 120 210 L 80 220 Z" fill="hsl(200, 65%, 50%)"/>
+                    <text class="municipality-label" x="95" y="190">Balayan</text>
+                </g>
+
+                <!-- Central Region (Green shades) -->
+                <g id="bauan" class="municipality-region" onclick="showMunicipalityInfo('BAUAN')">
+                    <path d="M 110 200 L 150 190 L 160 240 L 120 250 Z" fill="hsl(150, 70%, 45%)"/>
+                    <text class="municipality-label" x="135" y="220">Bauan</text>
+                </g>
+
+                <g id="mabini" class="municipality-region" onclick="showMunicipalityInfo('MABINI')">
+                    <path d="M 140 250 L 180 240 L 190 290 L 150 300 Z" fill="hsl(150, 70%, 45%)"/>
+                    <text class="municipality-label" x="165" y="270">Mabini</text>
+                </g>
+
+                <g id="batangas-city" class="municipality-region" onclick="showMunicipalityInfo('BATANGAS CITY')">
+                    <path d="M 120 280 L 160 270 L 170 320 L 130 330 Z" fill="hsl(150, 70%, 45%)"/>
+                    <text class="municipality-label" x="145" y="300">Batangas City</text>
+                </g>
+
+                <g id="lemery" class="municipality-region" onclick="showMunicipalityInfo('LEMERY')">
+                    <path d="M 160 310 L 200 300 L 210 350 L 170 360 Z" fill="hsl(150, 70%, 45%)"/>
+                    <text class="municipality-label" x="185" y="330">Lemery</text>
+                </g>
+
+                <!-- Eastern Region (Yellow/Green shades) -->
+                <g id="lipa-city" class="municipality-region" onclick="showMunicipalityInfo('LIPA CITY')">
+                    <path d="M 150 150 L 190 140 L 200 190 L 160 200 Z" fill="hsl(80, 70%, 50%)"/>
+                    <text class="municipality-label" x="175" y="170">Lipa City</text>
+                </g>
+
+                <g id="tanauan" class="municipality-region" onclick="showMunicipalityInfo('TANAUAN')">
+                    <path d="M 190 140 L 230 130 L 240 180 L 200 190 Z" fill="hsl(100, 70%, 50%)"/>
+                    <text class="municipality-label" x="215" y="160">Tanauan</text>
+                </g>
+
+                <g id="agoncillo" class="municipality-region" onclick="showMunicipalityInfo('AGONCILLO')">
+                    <path d="M 150 200 L 190 190 L 200 240 L 160 250 Z" fill="hsl(120, 70%, 50%)"/>
+                    <text class="municipality-label" x="175" y="220">Agoncillo</text>
+                </g>
+
+                <g id="rosario" class="municipality-region" onclick="showMunicipalityInfo('ROSARIO')">
+                    <path d="M 190 190 L 230 180 L 240 230 L 200 240 Z" fill="hsl(120, 70%, 50%)"/>
+                    <text class="municipality-label" x="215" y="210">Rosario</text>
+                </g>
+
+                <g id="ibaan" class="municipality-region" onclick="showMunicipalityInfo('IBAAN')">
+                    <path d="M 210 240 L 250 230 L 260 280 L 220 290 Z" fill="hsl(120, 70%, 50%)"/>
+                    <text class="municipality-label" x="235" y="260">Ibaan</text>
+                </g>
+
+                <g id="san-pablo" class="municipality-region" onclick="showMunicipalityInfo('SAN PABLO')">
+                    <path d="M 230 180 L 270 170 L 280 220 L 240 230 Z" fill="hsl(100, 70%, 50%)"/>
+                    <text class="municipality-label" x="255" y="200">San Pablo</text>
+                </g>
+
+                <g id="malvar" class="municipality-region" onclick="showMunicipalityInfo('MALVAR')">
+                    <path d="M 230 230 L 270 220 L 280 270 L 240 280 Z" fill="hsl(120, 70%, 50%)"/>
+                    <text class="municipality-label" x="255" y="250">Malvar</text>
+                </g>
+
+                <g id="santo-tomas" class="municipality-region" onclick="showMunicipalityInfo('SANTO TOMAS')">
+                    <path d="M 270 220 L 310 210 L 320 260 L 280 270 Z" fill="hsl(120, 70%, 50%)"/>
+                    <text class="municipality-label" x="295" y="240">Santo Tomas</text>
+                </g>
+
+                <g id="cuenca" class="municipality-region" onclick="showMunicipalityInfo('CUENCA')">
+                    <path d="M 160 280 L 200 270 L 210 320 L 170 330 Z" fill="hsl(150, 70%, 45%)"/>
+                    <text class="municipality-label" x="185" y="300">Cuenca</text>
+                </g>
+            </svg>`;
+
+            mapContainer.innerHTML = svgHtml;
+
+            // Color municipalities based on data
             for (const [city, count] of Object.entries(locations)) {
-                const coords = municipalityCoords[city];
-                if (!coords) continue;
+                const element = document.querySelector(`#${city.toLowerCase().replace(/\s+/g, '-')}`);
+                if (!element) continue;
 
                 const intensity = count / maxCount;
-                const radius = 15 + (intensity * 20);
-
-                // Color: light to deep blue/cyan based on intensity
-                const hue = 200 - intensity * 40;
-                const sat = Math.max(40, 70 - intensity * 30);
-                const light = Math.max(35, 65 - intensity * 25);
+                const hue = 120 - (intensity * 120); // Green (120) to Red (0)
+                const sat = Math.max(50, 70 - intensity * 20);
+                const light = Math.max(40, 60 - intensity * 20);
                 const color = `hsl(${hue}, ${sat}%, ${light}%)`;
 
-                L.circleMarker(coords, {
-                    radius: radius,
-                    fillColor: color,
-                    color: 'rgba(59, 130, 246, 0.6)',
-                    weight: 2,
-                    opacity: 0.8,
-                    fillOpacity: 0.7
-                }).bindPopup(`<strong>${city}</strong><br>${count} member${count !== 1 ? 's' : ''}<br>${((count/maxCount)*100).toFixed(1)}%`)
-                  .addTo(map);
+                const path = element.querySelector('path');
+                if (path) path.setAttribute('fill', color);
+
+                // Add hover info
+                element.title = `${city}: ${count} member${count !== 1 ? 's' : ''} (${((count/maxCount)*100).toFixed(1)}%)`;
             }
 
-            window.batangasMapInstance = map;
+            window.showMunicipalityInfo = function(city) {
+                const count = locations[city] || 0;
+                alert(`${city}\n${count} member${count !== 1 ? 's' : ''}\n${((count/maxCount)*100).toFixed(1)}% of total`);
+            };
         }
 
         function renderSummary() {
