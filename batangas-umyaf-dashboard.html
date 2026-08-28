@@ -621,7 +621,7 @@
             const totalYA = allData.length;
             // Debug small groups
             const smallGroupYes = allData.filter(r => {
-                const val = String(r['SMALL GROUP INVOLVED? (Y/N)'] || '').trim().toUpperCase();
+                const val = String(r['SMALL GROUP INVOLED? (Y/N)'] || '').trim().toUpperCase();
                 return val === 'YES';
             }).length;
             const layServantYes = allData.filter(r => {
@@ -814,7 +814,7 @@
             const layServant = { 'YES': 0, 'NO': 0, 'UNRECORDED': 0 };
 
             allData.forEach(row => {
-                const sg = row['SMALL GROUP INVOLVED? (Y/N)'] || '';
+                const sg = row['SMALL GROUP INVOLED? (Y/N)'] || '';
                 if (sg === 'YES') smallGroup['YES']++;
                 else if (sg === 'NO') smallGroup['NO']++;
                 else smallGroup['UNRECORDED']++;
@@ -869,7 +869,7 @@
 
         function renderAgeChart() {
             const today = new Date();
-            const ageBrackets = { '18-24': 0, '25-29': 0, '30-35': 0, '36-40': 0, '41-45': 0, '46+': 0 };
+            const ageBrackets = { '24-29': 0, '30-35': 0, '36-40': 0, '41-45': 0 };
 
             allData.forEach(row => {
                 const birthDate = row['BIRTH DATE'];
@@ -880,12 +880,10 @@
                 const monthDiff = today.getMonth() - birth.getMonth();
                 if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
 
-                if (age >= 18 && age <= 24) ageBrackets['18-24']++;
-                else if (age >= 25 && age <= 29) ageBrackets['25-29']++;
+                if (age >= 24 && age <= 29) ageBrackets['24-29']++;
                 else if (age >= 30 && age <= 35) ageBrackets['30-35']++;
                 else if (age >= 36 && age <= 40) ageBrackets['36-40']++;
                 else if (age >= 41 && age <= 45) ageBrackets['41-45']++;
-                else if (age >= 46) ageBrackets['46+']++;
             });
 
             const ctx = document.getElementById('ageChart').getContext('2d');
@@ -954,65 +952,84 @@
             const mapContainer = document.getElementById('batangasMap');
             if (!mapContainer) return;
 
+            // Parse locations - extract city from "CITY, PROVINCE" format
             const locations = {};
             allData.forEach(row => {
                 const loc = row['LOCATION / ADDRESS (City, Province)'] || 'UNKNOWN';
-                const city = loc.split(',')[0].trim().toUpperCase();
+                let city = loc.split(',')[0].trim().toUpperCase();
+                // Normalize common variations
+                if (city.includes('LIPA')) city = 'LIPA CITY';
+                if (city.includes('HALANG')) city = 'LIPA CITY'; // Halang is in Lipa City
                 locations[city] = (locations[city] || 0) + 1;
             });
 
             const maxCount = Math.max(...Object.values(locations), 1);
 
-            // Batangas municipalities positioned geographically (row, col in grid)
-            const municipalities = {
-                'NASUGBU': [0, 1], 'CALATAGAN': [0, 0], 'BALAYAN': [0, 2],
-                'TUY': [1, 0], 'BAUAN': [1, 1], 'MABINI': [1, 3],
-                'LIPA CITY': [2, 1], 'ROSARIO': [2, 2], 'AGONCILLO': [2, 0],
-                'SAN PABLO': [2, 3], 'TANAUAN': [3, 1],
-                'BATANGAS CITY': [3, 0], 'MALVAR': [3, 2],
-                'SANTO TOMAS': [3, 3], 'IBAAN': [4, 1],
-                'CUENCA': [4, 0], 'LEMERY': [4, 2],
-                'UNKNOWN': [2, 2]
-            };
+            // Batangas geographic grid (municipalities positioned by actual geography)
+            const grid = [
+                ['CALATAGAN', 'NASUGBU', 'BALAYAN', null],
+                ['TUY', 'BAUAN', 'MABINI', null],
+                ['AGONCILLO', 'LIPA CITY', 'ROSARIO', 'SAN PABLO'],
+                ['BATANGAS CITY', 'TANAUAN', 'MALVAR', 'SANTO TOMAS'],
+                ['CUENCA', 'IBAAN', 'LEMERY', null]
+            ];
 
-            // SVG-based map with geographic positioning
-            let svgHtml = `<svg viewBox="0 0 600 550" style="width: 100%; height: 100%; max-width: 100%;">
-                <style>
-                    .municipality { cursor: pointer; transition: all 0.3s; }
-                    .municipality:hover { opacity: 0.9; filter: brightness(1.2); }
-                    .municipality-label { pointer-events: none; font-size: 11px; font-weight: 600; }
-                    .municipality-count { pointer-events: none; font-size: 16px; font-weight: 700; }
-                </style>`;
+            let html = `<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 16px;">`;
 
-            // Draw municipalities
-            for (const [city, count] of Object.entries(locations)) {
-                const pos = municipalities[city] || [2, 2];
-                const intensity = count / maxCount;
-                const x = pos[1] * 120 + 40;
-                const y = pos[0] * 100 + 40;
+            grid.forEach((row, rowIdx) => {
+                row.forEach((city, colIdx) => {
+                    if (!city) {
+                        html += `<div style="grid-column: span 1;"></div>`;
+                        return;
+                    }
 
-                // Color intensity from light to deep blue/cyan
-                const hue = 200 - intensity * 40;
-                const sat = Math.max(40, 70 - intensity * 30);
-                const light = Math.max(35, 65 - intensity * 25);
-                const color = `hsl(${hue}, ${sat}%, ${light}%)`;
+                    const count = locations[city] || 0;
+                    const intensity = count > 0 ? count / maxCount : 0;
 
-                svgHtml += `
-                    <g class="municipality">
-                        <circle cx="${x}" cy="${y}" r="38" fill="${color}" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2" opacity="0.85"/>
-                        <text class="municipality-label" x="${x}" y="${y - 8}" text-anchor="middle" fill="#e2e8f0">${city.substring(0, 8)}</text>
-                        <text class="municipality-count" x="${x}" y="${y + 12}" text-anchor="middle" fill="#ffffff">${count}</text>
-                    </g>
-                `;
-            }
+                    // Color gradient from light to deep teal
+                    const hue = 200 - intensity * 40;
+                    const sat = Math.max(40, 70 - intensity * 30);
+                    const light = Math.max(35, 65 - intensity * 25);
+                    const bgColor = `hsl(${hue}, ${sat}%, ${light}%)`;
 
-            svgHtml += `</svg>`;
-            mapContainer.innerHTML = svgHtml;
+                    html += `
+                        <div style="
+                            background: linear-gradient(135deg, ${bgColor} 0%, rgba(59, 130, 246, 0.2) 100%);
+                            border: 1px solid rgba(59, 130, 246, 0.4);
+                            border-radius: 8px;
+                            padding: 16px 12px;
+                            text-align: center;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                            min-height: 100px;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                        "
+                        onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 20px rgba(59, 130, 246, 0.6)';"
+                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                            <div style="font-size: 11px; color: rgba(226, 232, 240, 0.8); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">
+                                ${city}
+                            </div>
+                            <div style="font-size: 28px; font-weight: 700; color: #ffffff; line-height: 1;">
+                                ${count}
+                            </div>
+                            <div style="font-size: 10px; color: rgba(226, 232, 240, 0.7); margin-top: 4px;">
+                                ${count > 0 ? ((count/maxCount)*100).toFixed(0) + '%' : '-'}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+
+            html += `</div>`;
+            mapContainer.innerHTML = html;
         }
 
         function renderSummary() {
             const totalYA = allData.length;
-            const smallGroupPct = (allData.filter(r => r['SMALL GROUP INVOLVED? (Y/N)'] === 'YES').length / totalYA * 100).toFixed(1);
+            const smallGroupPct = (allData.filter(r => r['SMALL GROUP INVOLED? (Y/N)'] === 'YES').length / totalYA * 100).toFixed(1);
             const layServantPct = (allData.filter(r => r['LAY SERVANT? (Y/N)'] === 'YES').length / totalYA * 100).toFixed(1);
 
             const statuses = {};
