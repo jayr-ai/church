@@ -437,9 +437,35 @@
         <div class="main">
             <!-- Header -->
             <div class="header">
-                <div class="header-title">
-                    <h1>Batangas UMYAF</h1>
-                    <p>Young Adult Fellowship Overview • Philippines Annual Conference</p>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <!-- YAMOF Logo -->
+                    <svg width="60" height="60" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Blue background cross -->
+                        <rect x="35" y="0" width="30" height="50" fill="#4337c9"></rect>
+                        <rect x="35" y="70" width="30" height="50" fill="#4337c9"></rect>
+                        <rect x="0" y="35" width="50" height="30" fill="#4337c9"></rect>
+                        <rect x="50" y="35" width="50" height="30" fill="#4337c9"></rect>
+
+                        <!-- Orange diamond center -->
+                        <polygon points="50,20 80,50 50,80 20,50" fill="#ff6b35"></polygon>
+
+                        <!-- White accents on blue arms -->
+                        <polygon points="40,40 35,35 40,30 45,35" fill="white"></polygon>
+                        <polygon points="60,40 65,35 60,30 55,35" fill="white"></polygon>
+                        <polygon points="40,60 35,65 40,70 45,65" fill="white"></polygon>
+                        <polygon points="60,60 65,65 60,70 55,65" fill="white"></polygon>
+
+                        <!-- Black center circle -->
+                        <circle cx="50" cy="50" r="6" fill="black"></circle>
+
+                        <!-- Text -->
+                        <text x="50" y="105" font-size="10" font-weight="bold" text-anchor="middle" fill="#333">In JESUS' STEPS</text>
+                    </svg>
+
+                    <div class="header-title">
+                        <h1>Batangas UMYAF</h1>
+                        <p>Young Adult Fellowship Overview • Philippines Annual Conference</p>
+                    </div>
                 </div>
                 <div class="header-right">
                     <div>
@@ -507,16 +533,18 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: Geographic & Summary -->
-                    <div class="map-card" style="grid-column: span 1.5;">
-                        <div class="chart-title">Geographic Distribution - Batangas</div>
-                        <div id="map" style="height: 350px;"></div>
-                    </div>
+                    <!-- Row 3: Geographic & Summary (Single Row) -->
+                    <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                        <div class="map-card">
+                            <div class="chart-title">Geographic Distribution - Batangas</div>
+                            <div id="batangasMap" style="height: 300px; margin-top: 16px;"></div>
+                        </div>
 
-                    <div class="summary-card" style="grid-column: span 1.5;">
-                        <div class="chart-title">Executive Summary</div>
-                        <div id="summaryContent">
-                            <p style="color: var(--text-secondary);">Loading summary...</p>
+                        <div class="summary-card">
+                            <div class="chart-title">Executive Summary</div>
+                            <div id="summaryContent">
+                                <p style="color: var(--text-secondary);">Loading summary...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -946,77 +974,56 @@
         }
 
         function renderMap() {
-            const batangasCenter = [13.7563, 121.6038];
-
-            if (!mapInstance) {
-                mapInstance = L.map('map', {
-                    center: batangasCenter,
-                    zoom: 10,
-                    scrollWheelZoom: false,
-                    dragging: true,
-                    zoomControl: true
-                });
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap',
-                    maxZoom: 19
-                }).addTo(mapInstance);
-            }
-
-            // Clear existing markers
-            mapInstance.eachLayer(layer => {
-                if (layer instanceof L.CircleMarker) {
-                    mapInstance.removeLayer(layer);
-                }
-            });
+            const mapContainer = document.getElementById('batangasMap');
+            if (!mapContainer) return;
 
             const locations = {};
-            const locationCoords = {
-                'LIPA CITY': [13.9448, 121.2851],
-                'TAGAYTAY': [13.9397, 121.0143],
-                'BATANGAS CITY': [13.7584, 121.1744],
-                'TALISAY': [14.0156, 121.1386],
-                'CALATAGAN': [13.8158, 120.9128],
-                'BALAYAN': [13.8444, 120.8806],
-                'BAUAN': [13.9078, 121.3269],
-                'NASUGBU': [13.8947, 121.0425],
-                'ROSARIO': [13.6667, 121.8667],
-                'UNKNOWN': batangasCenter
-            };
-
             allData.forEach(row => {
                 const loc = row['LOCATION / ADDRESS (City, Province)'] || 'UNKNOWN';
                 const city = loc.split(',')[0].trim().toUpperCase();
                 locations[city] = (locations[city] || 0) + 1;
             });
 
+            const sorted = Object.entries(locations).sort((a, b) => b[1] - a[1]);
             const maxCount = Math.max(...Object.values(locations));
-            const minCount = Math.min(...Object.values(locations));
 
-            Object.entries(locations).forEach(([city, count]) => {
-                const coords = locationCoords[city] || batangasCenter;
+            let html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 12px; padding: 16px 0;">
+            `;
 
-                // Heat map color: light blue to dark blue
-                const intensity = (count - minCount) / (maxCount - minCount || 1);
-                const hue = intensity * 240; // Blue range
-                const fillColor = `hsl(${220 - hue * 20}, 85%, ${65 - intensity * 25}%)`;
+            sorted.forEach(([city, count]) => {
+                const intensity = count / maxCount;
+                // Color gradient: light cyan to deep blue
+                const hsl = `hsl(${200 - intensity * 40}, ${85 - intensity * 20}%, ${65 - intensity * 25}%)`;
 
-                const size = Math.max(20, Math.min(60, 20 + (count / maxCount) * 40));
-
-                L.circleMarker(coords, {
-                    radius: size,
-                    fillColor: fillColor,
-                    color: colors.primaryLight,
-                    weight: 2,
-                    opacity: 0.8,
-                    fillOpacity: 0.75
-                }).bindPopup(`
-                    <div style="font-size: 12px;">
-                        <strong>${city}</strong><br>
-                        <span style="color: var(--primary);">${count} members</span>
+                html += `
+                    <div style="
+                        background: linear-gradient(135deg, ${hsl} 0%, rgba(59, 130, 246, 0.3) 100%);
+                        border: 1px solid rgba(59, 130, 246, 0.4);
+                        border-radius: 8px;
+                        padding: 12px;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        position: relative;
+                    "
+                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 15px rgba(59, 130, 246, 0.4)';"
+                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                            ${city}
+                        </div>
+                        <div style="font-size: 24px; font-weight: 700; color: #ffffff;">
+                            ${count}
+                        </div>
+                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
+                            ${((count/maxCount)*100).toFixed(0)}%
+                        </div>
                     </div>
-                `).addTo(mapInstance);
+                `;
             });
+
+            html += `</div>`;
+            mapContainer.innerHTML = html;
         }
 
         function renderSummary() {
