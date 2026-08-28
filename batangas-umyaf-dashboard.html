@@ -957,7 +957,7 @@
             // Parse locations
             const locations = {};
             allData.forEach(row => {
-                const loc = row['LOCATION / ADDRESS (City, Province)'] || 'UNKNOWN';
+                const loc = row['LOCATION / ADDRESS (City, Province is fine)'] || 'UNKNOWN';
                 let city = loc.split(',')[0].trim().toUpperCase();
                 if (city.includes('HALANG')) city = 'LIPA CITY';
                 locations[city] = (locations[city] || 0) + 1;
@@ -1046,7 +1046,7 @@
 
             const locations = {};
             allData.forEach(row => {
-                const loc = row['LOCATION / ADDRESS (City, Province)'] || 'Unknown';
+                const loc = row['LOCATION / ADDRESS (City, Province is fine)'] || 'Unknown';
                 locations[loc] = (locations[loc] || 0) + 1;
             });
             const topLocation = Object.entries(locations).sort((a, b) => b[1] - a[1])[0];
