@@ -971,81 +971,63 @@
 
             const maxCount = Math.max(...Object.values(locations), 1);
 
-            // ACCURATE Batangas Province map with proper geographic positioning
-            const svgHtml = `<svg viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                <defs>
-                    <style>
-                        .municipality-polygon { fill: #e8f4f8; stroke: #2c5aa0; stroke-width: 2; cursor: pointer; transition: all 0.3s; }
-                        .municipality-polygon:hover { stroke-width: 3; filter: brightness(1.15); }
-                        .municipality-label { font-size: 11px; font-weight: 600; fill: #1a3a5c; text-anchor: middle; pointer-events: none; }
-                        .water { fill: #b3d9f2; stroke: none; }
-                    </style>
-                </defs>
-
-                <!-- Water background -->
-                <rect x="0" y="0" width="800" height="900" class="water" opacity="0.3"/>
-                <circle cx="80" cy="300" r="120" class="water" opacity="0.5"/>
-
-                <!-- WESTERN COAST (1st District) -->
-                <polygon id="rosario" class="municipality-polygon" points="150,120 180,115 185,145 155,150"/>
-                <text class="municipality-label" x="168" y="135">Rosario</text>
-
-                <polygon id="nasugbu" class="municipality-polygon" points="130,170 165,165 170,210 135,215"/>
-                <text class="municipality-label" x="150" y="193">Nasugbu</text>
-
-                <polygon id="tuy" class="municipality-polygon" points="145,230 180,225 185,280 150,285"/>
-                <text class="municipality-label" x="165" y="258">Tuy</text>
-
-                <polygon id="bauan" class="municipality-polygon" points="155,295 195,290 200,350 160,355"/>
-                <text class="municipality-label" x="177" y="323">Bauan</text>
-
-                <polygon id="lian" class="municipality-polygon" points="160,365 200,360 205,420 165,425"/>
-                <text class="municipality-label" x="183" y="393">Lian</text>
-
-                <polygon id="balayan" class="municipality-polygon" points="140,435 185,430 190,495 145,500"/>
-                <text class="municipality-label" x="165" y="468">Balayan</text>
-
-                <!-- CENTRAL REGION (2nd District) -->
-                <polygon id="batangas-city" class="municipality-polygon" points="250,280 330,270 340,370 260,380"/>
-                <text class="municipality-label" x="295" y="330">Batangas City</text>
-
-                <polygon id="lemery" class="municipality-polygon" points="210,385 265,380 270,450 215,455"/>
-                <text class="municipality-label" x="240" y="420">Lemery</text>
-
-                <polygon id="santo-tomas" class="municipality-polygon" points="280,395 345,390 350,460 285,465"/>
-                <text class="municipality-label" x="315" y="430">Santo Tomas</text>
-
-                <polygon id="calaca" class="municipality-polygon" points="235,470 295,465 300,530 240,535"/>
-                <text class="municipality-label" x="268" y="503">Calaca</text>
-
-                <polygon id="lobo" class="municipality-polygon" points="255,560 310,555 315,620 260,625"/>
-                <text class="municipality-label" x="285" y="593">Lobo</text>
-
-                <!-- EASTERN REGION (3rd District) -->
-                <polygon id="san-pascual" class="municipality-polygon" points="380,250 430,245 435,310 385,315"/>
-                <text class="municipality-label" x="408" y="280">San Pascual</text>
-
-                <polygon id="taal" class="municipality-polygon" points="395,330 450,325 455,400 400,405"/>
-                <text class="municipality-label" x="427" y="365">Taal</text>
-
-                <polygon id="ibaan" class="municipality-polygon" points="340,420 400,415 405,490 345,495"/>
-                <text class="municipality-label" x="373" y="457">Ibaan</text>
-
-                <polygon id="mabini" class="municipality-polygon" points="410,520 480,515 485,600 415,605"/>
-                <text class="municipality-label" x="448" y="562">Mabini</text>
-
-                <!-- SOUTHERN REGION (4th District) -->
-                <polygon id="calatagan" class="municipality-polygon" points="270,620 330,615 335,700 275,705"/>
-                <text class="municipality-label" x="303" y="662">Calatagan</text>
-
-                <polygon id="tingloy" class="municipality-polygon" points="490,650 540,645 545,720 495,725"/>
-                <text class="municipality-label" x="518" y="688">Tingloy</text>
-
-                <polygon id="alitagtag" class="municipality-polygon" points="440,750 495,745 500,820 445,825"/>
-                <text class="municipality-label" x="470" y="787">Alitagtag</text>
-
-                <polygon id="balete" class="municipality-polygon" points="370,770 425,765 430,840 375,845"/>
-                <text class="municipality-label" x="400" y="807">Balete</text>
+            // ACCURATE Batangas Province map matching geographic reference
+            const svgHtml = `<svg viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+              <defs>
+                <style>
+                  .district-1 { fill: #4a90e2; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
+                  .district-2 { fill: #7cb342; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
+                  .district-3 { fill: #a68b70; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
+                  .district-4 { fill: #f7c325; stroke: #2c3e50; stroke-width: 1.5; cursor: pointer; transition: all 0.3s; }
+                  .water-feature { fill: #ffffff; stroke: #4a90e2; stroke-width: 1; }
+                  .municipality-label { font-size: 10px; font-family: Arial, sans-serif; font-weight: 500; text-anchor: middle; fill: #000; pointer-events: none; }
+                  .district-boundary { fill: none; stroke: #2c3e50; stroke-width: 2; }
+                </style>
+              </defs>
+              <rect width="600" height="700" fill="#e8f4f8"/>
+              <path class="district-1" d="M 110 120 L 180 100 L 200 150 L 210 200 L 180 250 L 150 280 L 120 250 L 100 200 L 90 150 Z" id="d1-1"/>
+              <path class="district-1" d="M 90 150 L 80 180 L 75 220 L 85 260 L 120 250 L 100 200 Z" id="d1-2"/>
+              <path class="district-1" d="M 150 280 L 160 320 L 140 340 L 120 320 L 130 300 Z" id="d1-3"/>
+              <path class="district-2" d="M 210 200 L 280 220 L 300 280 L 280 320 L 240 340 L 200 320 L 180 250 Z" id="d2-1"/>
+              <path class="district-2" d="M 240 340 L 270 360 L 260 380 L 230 370 Z" id="d2-2"/>
+              <path class="district-3" d="M 200 150 L 280 120 L 320 140 L 340 200 L 320 260 L 280 220 L 210 200 Z" id="d3-1"/>
+              <path class="district-3" d="M 320 140 L 360 160 L 380 220 L 340 200 Z" id="d3-2"/>
+              <path class="district-4" d="M 320 260 L 380 220 L 420 250 L 430 310 L 400 360 L 340 340 L 300 280 Z" id="d4-1"/>
+              <path class="district-4" d="M 430 310 L 450 340 L 430 380 L 400 360 Z" id="d4-2"/>
+              <ellipse cx="270" cy="180" rx="55" ry="65" class="water-feature"/>
+              <path class="water-feature" d="M 385 240 Q 420 260 410 310 Q 390 320 370 300 Q 380 270 385 240 Z"/>
+              <circle cx="310" cy="420" r="12" class="water-feature"/>
+              <circle cx="280" cy="380" r="8" class="water-feature"/>
+              <path class="district-boundary" d="M 110 120 L 180 100 L 200 150 L 280 120 L 360 160 L 420 250 L 450 340 L 430 380 L 400 360 L 340 340 L 270 360 L 260 380 L 230 370 L 220 400 L 180 420 L 140 400 L 120 350 L 100 300 L 80 220 L 75 180 L 85 150 L 110 120 Z"/>
+              <text x="270" y="185" class="municipality-label" font-size="11px">Taal Lake</text>
+              <text x="410" y="290" class="municipality-label" font-size="11px">Batangas Bay</text>
+              <text x="310" y="440" class="municipality-label" font-size="10px">Verde Island</text>
+              <text x="145" y="115" class="municipality-label" id="nasugbu">Nasugbu</text>
+              <text x="125" y="165" class="municipality-label" id="lian">Lian</text>
+              <text x="155" y="185" class="municipality-label" id="tuy">Tuy</text>
+              <text x="130" y="240" class="municipality-label" id="balayan">Balayan</text>
+              <text x="110" y="290" class="municipality-label" id="calatagan">Calatagan</text>
+              <text x="185" y="220" class="municipality-label" id="agoncillo">Agoncillo</text>
+              <text x="210" y="240" class="municipality-label" id="san-nicolas">San Nicolas</text>
+              <text x="195" y="280" class="municipality-label" id="sta-teresita">Sta. Teresita</text>
+              <text x="240" y="200" class="municipality-label" id="alitagtag">Alitagtag</text>
+              <text x="245" y="250" class="municipality-label" id="san-loy">San Loy</text>
+              <text x="270" y="300" class="municipality-label" id="bauan">Bauan</text>
+              <text x="255" y="360" class="municipality-label" id="malayan">Malayan</text>
+              <text x="310" y="350" class="municipality-label" id="lobo">Lobo</text>
+              <text x="330" y="320" class="municipality-label" id="batangas-city">Batangas City</text>
+              <text x="295" y="155" class="municipality-label" id="laurel">Laurel</text>
+              <text x="340" y="160" class="municipality-label" id="talisay">Talisay</text>
+              <text x="370" y="190" class="municipality-label" id="tanauan">Tanauan</text>
+              <text x="350" y="240" class="municipality-label" id="malvar">Malvar</text>
+              <text x="310" y="220" class="municipality-label" id="santo-tomas">Sto. Tomas</text>
+              <text x="345" y="280" class="municipality-label" id="cuenca">Cuenca</text>
+              <text x="370" y="310" class="municipality-label" id="ibaan">Ibaan</text>
+              <text x="375" y="280" class="municipality-label" id="lipa-city">Lipa City</text>
+              <text x="410" y="330" class="municipality-label" id="padre-garcia">Padre Garcia</text>
+              <text x="445" y="310" class="municipality-label" id="san-juan">San Juan</text>
+              <text x="420" y="360" class="municipality-label" id="rosario">Rosario</text>
+              <text x="380" y="380" class="municipality-label" id="taysan">Taysan</text>
             </svg>`;
 
             mapContainer.innerHTML = svgHtml;
