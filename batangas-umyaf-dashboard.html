@@ -956,10 +956,16 @@
             const locations = {};
             allData.forEach(row => {
                 const loc = row['LOCATION / ADDRESS (City, Province is fine)'] || 'UNKNOWN';
-                let city = loc.split(',')[0].trim().toUpperCase();
-                // Normalize common city variations
-                if (city.includes('HALANG')) city = 'LIPA CITY';
-                if (city.includes('PLARIDEL')) city = 'TANAUAN';
+                let city = 'UNKNOWN';
+                const parts = loc.split(',').map(p => p.trim().toUpperCase());
+
+                // Format is "BARANGAY, CITY, PROVINCE" - extract CITY (second part)
+                if (parts.length >= 2) {
+                    city = parts[1]; // Get the CITY part
+                } else if (parts.length === 1) {
+                    city = parts[0]; // Fallback to first part if only one element
+                }
+
                 locations[city] = (locations[city] || 0) + 1;
             });
 
@@ -1104,7 +1110,14 @@
             const locations = {};
             allData.forEach(row => {
                 const loc = row['LOCATION / ADDRESS (City, Province is fine)'] || 'Unknown';
-                locations[loc] = (locations[loc] || 0) + 1;
+                const parts = loc.split(',').map(p => p.trim());
+                let city = 'Unknown';
+                if (parts.length >= 2) {
+                    city = parts[1]; // Extract CITY (second part)
+                } else if (parts.length === 1) {
+                    city = parts[0];
+                }
+                locations[city] = (locations[city] || 0) + 1;
             });
             const topLocation = Object.entries(locations).sort((a, b) => b[1] - a[1])[0];
 
