@@ -1,0 +1,29 @@
+name: Fetch Sheet Data
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Run every hour
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  fetch-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Fetch Google Sheet as CSV
+        run: |
+          SHEET_ID="1N0KEJ6vZ8gws1QgxrO_f3z8APDgbV4cslo56a56FPhI"
+          GID="0"
+          CSV_URL="https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}"
+          curl -L "$CSV_URL" -o data/sheet-data.csv
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add data/sheet-data.csv
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update sheet data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')" && git push)

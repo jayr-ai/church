@@ -552,8 +552,8 @@
     </div>
 
     <script>
-        // Direct Google Apps Script endpoint with OPTIONS CORS preflight support
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFAMqpLhBjodRIAmkQPsB-V6IovvPV61O_lhRJnBCSKpscLnKxY0M9dY8v1D8TVw_Q/exec';
+        // Fetch CSV data from GitHub (updated automatically by GitHub Actions)
+        const DATA_URL = '/church/data/sheet-data.csv';
 
         let allData = [];
         let chartInstances = {};
@@ -589,14 +589,29 @@
                 const errorContainer = document.getElementById('errorContainer');
                 errorContainer.innerHTML = '';
 
-                // Fetch data from Vercel serverless proxy
-                const response = await fetch(APPS_SCRIPT_URL);
+                // Fetch CSV data from GitHub
+                const response = await fetch(DATA_URL);
                 if (!response.ok) throw new Error(`Failed to load data: ${response.statusText}`);
 
-                const result = await response.json();
-                if (!result.success) throw new Error(result.error || 'Unknown error');
+                const csv = await response.text();
+                const lines = csv.split('\n').map(line => line.trim()).filter(line => line);
 
-                allData = result.data;
+                if (lines.length < 2) {
+                    throw new Error('No data found in sheet');
+                }
+
+                // Parse CSV
+                const headers = parseCSV(lines[0]);
+                const data = lines.slice(1).map(line => {
+                    const values = parseCSV(line);
+                    const obj = {};
+                    headers.forEach((header, idx) => {
+                        obj[header] = values[idx] || '';
+                    });
+                    return obj;
+                });
+
+                allData = data.filter(row => row['FULL NAME'] && row['FULL NAME'].trim());
 
                 // Update last updated time
                 const now = new Date();
@@ -618,10 +633,38 @@
                 errorContainer.innerHTML = `
                     <div class="error">
                         <strong>Error loading data:</strong> ${error.message}<br>
-                        <small>Make sure the Google Apps Script endpoint is deployed and accessible.</small>
+                        <small>Make sure the CSV data file is available in /data/sheet-data.csv</small>
                     </div>
                 `;
             }
+        }
+
+        function parseCSV(line) {
+            const result = [];
+            let current = '';
+            let insideQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+
+                if (char === '"') {
+                    if (insideQuotes && nextChar === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        insideQuotes = !insideQuotes;
+                    }
+                } else if (char === ',' && !insideQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+
+            result.push(current.trim());
+            return result;
         }
 
         function renderKPIs() {
