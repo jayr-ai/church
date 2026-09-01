@@ -513,6 +513,16 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Geographic Section (hidden by default) -->
+                <div id="geographicSection" style="display: none; grid-column: 1 / -1; padding: 32px;">
+                    <h2 style="font-size: 24px; margin-bottom: 24px; color: var(--text-primary);">Geographic Distribution</h2>
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-secondary);">
+                        <p style="font-size: 16px; margin-bottom: 16px;">Batangas Province Member Map</p>
+                        <div id="map" style="height: 400px; border-radius: 8px; background: var(--bg-dark);"></div>
+                        <p style="font-size: 14px; margin-top: 16px; color: var(--text-secondary);">Coming soon: Interactive choropleth map showing member distribution by municipality</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -970,6 +980,33 @@
                 </div>
             `;
         }
+
+        // Nav item click handlers
+        document.querySelectorAll('.nav-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                // Remove active class from all nav items
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                // Toggle sections based on clicked nav item
+                const chartsContainer = document.getElementById('chartsContainer');
+                const kpiContainer = document.getElementById('kpiContainer');
+                const geographicSection = document.getElementById('geographicSection');
+
+                if (index === 2) {
+                    // Geographic section clicked
+                    chartsContainer.style.display = 'none';
+                    kpiContainer.style.display = 'none';
+                    geographicSection.style.display = 'grid';
+                } else {
+                    // Overview or Demographics clicked
+                    chartsContainer.style.display = 'grid';
+                    kpiContainer.style.display = 'grid';
+                    geographicSection.style.display = 'none';
+                }
+            });
+        });
 
         window.addEventListener('load', loadData);
     </script>
