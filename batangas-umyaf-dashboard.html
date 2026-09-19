@@ -258,6 +258,13 @@
             grid-column: span 1.5;
         }
 
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            grid-column: 1 / -1;
+        }
+
         @media (max-width: 1600px) {
             .charts-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -386,6 +393,10 @@
             .kpi-row {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -462,46 +473,50 @@
                 <!-- Charts Grid -->
                 <div class="charts-grid" id="chartsContainer" style="display: none;">
                     <!-- Row 1: Status Charts -->
-                    <div class="chart-card">
-                        <div class="chart-title">Membership Status</div>
-                        <div class="chart-wrapper">
-                            <canvas id="statusChart"></canvas>
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <div class="chart-title">Membership Status</div>
+                            <div class="chart-wrapper">
+                                <canvas id="statusChart"></canvas>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-title">Civil Status Distribution</div>
-                        <div class="chart-wrapper">
-                            <canvas id="civilChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-title">Civil Status Distribution</div>
+                            <div class="chart-wrapper">
+                                <canvas id="civilChart"></canvas>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-title">Gender Composition</div>
-                        <div class="chart-wrapper">
-                            <canvas id="genderChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-title">Gender Composition</div>
+                            <div class="chart-wrapper">
+                                <canvas id="genderChart"></canvas>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Row 2: Engagement & Demographics -->
-                    <div class="chart-card">
-                        <div class="chart-title">Engagement Levels</div>
-                        <div class="chart-wrapper">
-                            <canvas id="involvementChart"></canvas>
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <div class="chart-title">Engagement Levels</div>
+                            <div class="chart-wrapper">
+                                <canvas id="involvementChart"></canvas>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-title">Age Bracket Distribution</div>
-                        <div class="chart-wrapper">
-                            <canvas id="ageChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-title">Age Bracket Distribution</div>
+                            <div class="chart-wrapper">
+                                <canvas id="ageChart"></canvas>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-title">Members by Local Church</div>
-                        <div class="chart-wrapper">
-                            <canvas id="churchChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-title">Members by Local Church</div>
+                            <div class="chart-wrapper">
+                                <canvas id="churchChart"></canvas>
+                            </div>
                         </div>
                     </div>
 
